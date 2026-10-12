@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Mlandu Times</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Source+Serif+4:wght@400;600&display=swap">
+<style>
+:root{--paper:#f4efe4;--ink:#161513;--mute:#5c574d;--accent:#9b1c1c;--card:#ebe4d4}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#171614;--ink:#ece6d8;--mute:#a49d8d;--accent:#e05a4f;--card:#211f1c}}
+:root[data-theme="dark"]{--paper:#171614;--ink:#ece6d8;--mute:#a49d8d;--accent:#e05a4f;--card:#211f1c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:'Source Serif 4',Georgia,serif;line-height:1.5}
+.wrap{max-width:1080px;margin:0 auto;padding:16px}
+.top{display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);border-bottom:1px solid var(--ink);padding-bottom:6px;flex-wrap:wrap;gap:6px}
+button{font:600 13px 'Source Serif 4',Georgia,serif;background:var(--ink);color:var(--paper);border:0;padding:7px 14px;margin:4px 6px 0 0;cursor:pointer}
+button.g{background:transparent;color:var(--ink);border:1px solid var(--ink);padding:3px 9px;margin:0 0 0 6px;font-size:12px}
+select{font:inherit;font-size:13px;background:var(--card);color:var(--ink);border:1px solid var(--ink);padding:2px}
+a{color:var(--accent)}
+h1{font-family:'Playfair Display',Georgia,serif;font-weight:900;font-size:clamp(38px,9vw,88px);text-align:center;margin:10px 0 2px;line-height:1}
+.tag{text-align:center;font-family:'Playfair Display',Georgia,serif;font-style:italic;font-weight:700;font-size:clamp(15px,2.6vw,21px);margin:0 0 10px}.tag span{color:var(--accent)}
+.dbl{border-top:3px solid var(--ink);border-bottom:1px solid var(--ink);height:7px;margin:6px 0}
+.brk{background:var(--accent);color:#fff;padding:6px 12px;margin:14px 0;font-size:14px;font-weight:600}.brk b{letter-spacing:.12em;text-transform:uppercase;margin-right:8px}
+.kick{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:600;margin:8px 0 2px}
+h2{font-family:'Playfair Display',Georgia,serif;font-size:clamp(28px,5vw,46px);line-height:1.06;margin:2px 0 8px}
+h3{font-family:'Playfair Display',Georgia,serif;font-size:19px;line-height:1.2;margin:2px 0 4px}
+.cr{font-size:11px;color:var(--mute);margin:2px 0 8px}
+p{margin:0 0 10px}
+img.ph{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;background:var(--card);border:1px solid var(--ink);filter:grayscale(.15) contrast(1.03)}
+.lead{display:grid;grid-template-columns:2fr 1fr;gap:0 26px}
+.lead>aside{border-left:1px solid var(--ink);padding-left:26px}
+.box{background:var(--card);border:1px solid var(--ink);padding:12px;margin:10px 0;font-size:14px}
+.item{border-top:1px solid var(--ink);padding-top:6px;margin-bottom:12px}
+.sec{border-top:4px double var(--ink);margin-top:24px;padding-top:6px}
+.sec>h4{font-family:'Playfair Display',Georgia,serif;font-size:14px;letter-spacing:.24em;text-transform:uppercase;margin:0 0 10px;text-align:center}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px 24px}
+.cards>div{border-left:1px solid var(--ink);padding-left:24px}.cards>div:nth-child(3n+1){border-left:0;padding-left:0}
+.cw{display:grid;grid-template-columns:repeat(5,44px);width:max-content;border:2px solid var(--ink);margin:8px 0}
+.cw div{width:44px;height:44px;border:1px solid var(--ink)}
+.cw input{width:100%;height:100%;border:0;background:transparent;color:var(--ink);text-align:center;font:700 22px 'Playfair Display',Georgia,serif;text-transform:uppercase;padding:0;outline:0;border-radius:0}
+.cw input:focus{background:var(--card)}.cw input.ok{color:#2a7d3f}.cw input.bad{color:var(--accent)}
+.cwrap{display:flex;gap:24px;flex-wrap:wrap}.clues{font-size:14px;flex:1;min-width:220px}.clues b{display:block;letter-spacing:.12em;text-transform:uppercase;font-size:11px;margin-top:6px}
+.foot{border-top:3px solid var(--ink);margin-top:28px;padding-top:10px;font-size:12px;color:var(--mute);text-align:center}
+#ov{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:16px;z-index:9}#ov.on{display:flex}
+.modal{background:var(--paper);color:var(--ink);border:3px double var(--ink);max-width:520px;width:100%;padding:22px;max-height:100%;overflow:auto}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.chip{border:1px solid var(--ink);padding:7px 12px;cursor:pointer;font-size:14px;user-select:none}.chip.on{background:var(--ink);color:var(--paper)}
+@media(max-width:760px){.lead,.cards{grid-template-columns:1fr}.lead>aside,.cards>div{border-left:0;padding-left:0}}
+</style>
+</head>
+<body>
+<div id="ov"><div class="modal">
+<h3 style="font-size:26px">Build your front page</h3>
+<p>Tap topics in the order you want them. The biggest story of the day always leads.</p>
+<div class="chips" id="chips"></div>
+<label style="font-size:14px">Your region: <select id="regsel"></select></label>
+<p style="font-size:12px;color:var(--mute)">We guess your region from your device time zone. No tracking.</p>
+<button onclick="save()">Print my edition</button>
+</div></div>
+<div class="wrap">
+<div class="top"><span id="date"></span><span id="regl"></span><span><button class="g" onclick="openP()">My interests</button><button class="g" onclick="tg()">Dark / Light</button></span></div>
+<h1>The Mlandu Times</h1>
+<p class="tag">Comfort the conflicted. <span>Conflict the comfortable.</span></p>
+<div class="dbl"></div>
+<div id="front"></div>
+<div id="secs"></div>
+<div class="foot">We lean left, we say so, and we keep facts and opinion apart. Stories and images are supplied by the outlets credited, via GNews, and link back to the original. Updated daily.</div>
+</div>
+<script>
+const DATA=/*__DATA__*/null;
+const IN=[["mideast","Palestine & Middle East"],["world","World"],["local","Local"],["sport","Sport"],["culture","Culture"],["tech","Tech"],["puzzles","Puzzles"]];
+const REG={za:"South Africa",ie:"Ireland & UK",me:"Middle East",gl:"Elsewhere"};
+const WORDS=["HEART","EMBER","ABUSE","RESIN","TREND"];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const safe=u=>/^https?:\/\//i.test(u)?esc(u):"#";
+let st={i:[],reg:null},pick=[],seen=new Set();
+try{const v=JSON.parse(localStorage.getItem("mt"));if(v&&v.i)st=v}catch(e){}
+function guess(){let z="";try{z=Intl.DateTimeFormat().resolvedOptions().timeZone||""}catch(e){}
+if(/^Africa\/(Johannesburg|Harare|Maputo|Windhoek|Gaborone|Lusaka)/.test(z))return"za";
+if(/^Europe\/(Dublin|London)/.test(z))return"ie";
+if(/^Asia\/(Dubai|Riyadh|Jerusalem|Tel_Aviv|Muscat|Amman|Beirut|Baghdad|Qatar|Kuwait)/.test(z))return"me";
+return"gl"}
+function img(a,cls){return a.img?`<img class="ph" loading="lazy" referrerpolicy="no-referrer" src="${safe(a.img)}" alt="" onerror="this.remove()"><p class="cr">Image: ${esc(a.src)}</p>`:""}
+function card(a){return `<div>${img(a)}<h3><a href="${safe(a.url)}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">${esc(a.title)}</a></h3><p>${esc(a.desc)}</p><p class="cr"><a href="${safe(a.url)}" target="_blank" rel="noopener">Read at ${esc(a.src)} &rarr;</a></p></div>`}
+function uniq(list,n){const out=[];for(const a of list||[]){if(!a.url||seen.has(a.url))continue;seen.add(a.url);out.push(a);if(out.length>=n)break}return out}
+function draw(){
+seen=new Set();const r=st.reg;
+$("date").textContent=new Date(DATA.built).toLocaleDateString("en-ZA",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+$("regl").textContent=REG[r]+" Edition";
+const lead=uniq(DATA.world.filter(a=>a.img).concat(DATA.world),1)[0];
+if(!lead){$("front").innerHTML="<p>Today's edition could not be loaded. Check back soon.</p>"}
+else{
+const also=uniq(DATA.world,3),near=uniq(DATA.regions[r==="gl"?"ie":r]||[],2);
+$("front").innerHTML=`<div class="brk"><b>Top story</b>${esc(lead.title)}</div>
+<article class="lead"><div><div class="kick">Top Story</div><h2>${esc(lead.title)}</h2>${img(lead)}<p>${esc(lead.desc)}</p><p class="cr"><a href="${safe(lead.url)}" target="_blank" rel="noopener">Read the full report at ${esc(lead.src)} &rarr;</a></p></div>
+<aside><div class="box"><b>Also today</b>${also.map(a=>`<div class="item"><a href="${safe(a.url)}" target="_blank" rel="noopener" style="color:inherit">${esc(a.title)}</a><div class="cr">${esc(a.src)}</div></div>`).join("")}</div>
+<div class="box"><b>Near you: ${REG[r]}</b>${near.map(a=>`<div class="item"><a href="${safe(a.url)}" target="_blank" rel="noopener" style="color:inherit">${esc(a.title)}</a><div class="cr">${esc(a.src)}</div></div>`).join("")||"<p>No local stories yet.</p>"}</div></aside></article>`}
+let t="";
+for(const k of st.i){const nm=IN.find(x=>x[0]===k)[1];
+if(k==="puzzles"){t+=`<div class="sec"><h4>${nm}</h4><div class="cwrap"><div><div class="cw" id="cw"></div><button onclick="chk()">Check</button><button onclick="rev()">Reveal</button><button onclick="clr()">Clear</button><p id="msg" style="font-size:14px"></p></div><div class="clues"><b>Across (rows)</b>1. Centre of the matter<br>2. Glowing coal<br>3. Rights groups document this<br>4. Sticky tree secretion<br>5. What is hot on social media<b>Down (columns)</b>1. Organ that skips a beat<br>2. Hot remnant after the flames<br>3. Misuse of power<br>4. Amber's origin<br>5. Direction of the polls</div></div></div>`;continue}
+const src=k==="local"?(DATA.regions[r==="gl"?"ie":r]||[]):DATA[k];
+const l=uniq((src||[]).filter(a=>a.img).concat(src||[]),6);
+if(l.length)t+=`<div class="sec"><h4>${nm}</h4><div class="cards">${l.map(card).join("")}</div></div>`}
+$("secs").innerHTML=t;if($("cw"))cwInit()}
+function openP(){pick=st.i.slice();$("chips").innerHTML="";
+IN.forEach(x=>{const d=document.createElement("span");d.className="chip";d.textContent=x[1];d.onclick=()=>{const k=pick.indexOf(x[0]);k>-1?pick.splice(k,1):pick.push(x[0]);paint()};d.dataset.k=x[0];$("chips").appendChild(d)});
+$("regsel").innerHTML=Object.entries(REG).map(([k,v])=>`<option value="${k}">${esc(v)}</option>`).join("");$("regsel").value=st.reg||guess();paint();$("ov").className="on"}
+function paint(){document.querySelectorAll(".chip").forEach(d=>{const k=pick.indexOf(d.dataset.k);d.className="chip"+(k>-1?" on":"");d.textContent=IN.find(x=>x[0]===d.dataset.k)[1]+(k>-1?" ("+(k+1)+")":"")})}
+function save(){st.i=pick.length?pick:IN.map(x=>x[0]);st.reg=$("regsel").value;try{localStorage.setItem("mt",JSON.stringify(st))}catch(e){}$("ov").className="";draw()}
+let ins=[];
+function cwInit(){const cw=$("cw");ins=[];for(let i=0;i<25;i++){const d=document.createElement("div"),n=document.createElement("input");n.maxLength=1;n.setAttribute("aria-label","Row "+(Math.floor(i/5)+1)+" column "+(i%5+1));n.oninput=()=>{n.className="";n.value=n.value.replace(/[^a-z]/gi,"");if(n.value&&ins[i+1])ins[i+1].focus()};d.appendChild(n);cw.appendChild(d);ins.push(n)}}
+function chk(){let ok=0;ins.forEach((n,k)=>{const v=n.value.toUpperCase();if(!v){n.className="";return}const g=WORDS[Math.floor(k/5)][k%5]===v;n.className=g?"ok":"bad";if(g)ok++});$("msg").textContent=ok===25?"Perfect. Front page material.":ok+" of 25 correct so far."}
+function rev(){ins.forEach((n,k)=>{n.value=WORDS[Math.floor(k/5)][k%5];n.className="ok"})}
+function clr(){ins.forEach(n=>{n.value="";n.className=""});$("msg").textContent=""}
+function tg(){const h=document.documentElement,d=matchMedia("(prefers-color-scheme: dark)").matches,c=h.dataset.theme||(d?"dark":"light");h.dataset.theme=c==="dark"?"light":"dark"}
+if(st.i.length&&st.reg)draw();else{st.reg=guess();st.i=IN.map(x=>x[0]);draw();openP()}
+</script>
+</body>
+</html>
