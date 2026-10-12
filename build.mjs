@@ -26,10 +26,23 @@ const ELECTIONS = [
 ];
 
 const base = "https://gnews.io/api/v4";
+// GNews free tier rejects bursts (429), so space requests out and retry politely.
+let last = 0;
+async function throttle() {
+  const wait = Math.max(0, last + 1300 - Date.now());
+  last = Date.now() + wait;
+  if (wait) await new Promise(r => setTimeout(r, wait));
+}
 async function get(path, params, max = "10") {
   const q = new URLSearchParams({ lang: "en", max, ...params, apikey: KEY });
   try {
-    const r = await fetch(`${base}/${path}?${q}`);
+    let r;
+    for (let tries = 0; tries < 3; tries++) {
+      await throttle();
+      r = await fetch(`${base}/${path}?${q}`);
+      if (r.status !== 429) break;
+      await new Promise(res => setTimeout(res, 4000));
+    }
     if (!r.ok) throw new Error(`${r.status} ${path} ${JSON.stringify(params)}`);
     const j = await r.json();
     return (j.articles || []).map(a => ({
