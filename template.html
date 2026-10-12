@@ -45,6 +45,10 @@ img.ph{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;background:v
 .modal{background:var(--paper);color:var(--ink);border:3px double var(--ink);max-width:520px;width:100%;padding:22px;max-height:100%;overflow:auto}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
 .chip{border:1px solid var(--ink);padding:7px 12px;cursor:pointer;font-size:14px;user-select:none}.chip.on{background:var(--ink);color:var(--paper)}
+.tabs{display:flex;justify-content:center;gap:8px;margin:10px 0}.tabs button{background:transparent;color:var(--ink);border:1px solid var(--ink);margin:0}.tabs button.on{background:var(--ink);color:var(--paper)}
+.bar{display:flex;height:10px;border:1px solid var(--ink);margin:4px 0}.bar i{display:block}.bl{background:#2b5fa8}.bc{background:#8a8a8a}.br{background:#b53a3a}.bu{background:var(--card)}
+.blind{display:inline-block;border:1px solid var(--accent);color:var(--accent);font-size:11px;padding:1px 6px;margin-left:6px}
+ul{margin:6px 0 0;padding-left:18px}
 @media(max-width:760px){.lead,.cards{grid-template-columns:1fr}.lead>aside,.cards>div{border-left:0;padding-left:0}}
 </style>
 </head>
@@ -62,8 +66,10 @@ img.ph{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;background:v
 <h1>The Mlandu Times</h1>
 <p class="tag">Comfort the conflicted. <span>Conflict the comfortable.</span></p>
 <div class="dbl"></div>
+<div class="tabs"><button id="t1" onclick="view('front')">Front Page</button><button id="t2" onclick="view('elec')">Elections</button></div>
 <div id="front"></div>
 <div id="secs"></div>
+<div id="elec" style="display:none"></div>
 <div class="foot">We lean left, we say so, and we keep facts and opinion apart. Stories and images are supplied by the outlets credited, via GNews, and link back to the original. Updated daily.</div>
 </div>
 <script>
@@ -88,13 +94,13 @@ function draw(){
 seen=new Set();const r=st.reg;
 $("date").textContent=new Date(DATA.built).toLocaleDateString("en-ZA",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
 $("regl").textContent=REG[r]+" Edition";
-const lead=uniq(DATA.world.filter(a=>a.img).concat(DATA.world),1)[0];
+const lead=(DATA.stories||[])[0]||uniq(DATA.world.filter(a=>a.img).concat(DATA.world),1)[0];if(lead)seen.add(lead.url);
 if(!lead){$("front").innerHTML="<p>Today's edition could not be loaded. Check back soon.</p>"}
 else{
-const also=uniq(DATA.world,3),near=uniq(DATA.regions[r==="gl"?"ie":r]||[],2);
+const also=(DATA.stories||[]).length?DATA.stories.slice(1,4).map(a=>(seen.add(a.url),a)):uniq(DATA.world,3),near=uniq(DATA.regions[r==="gl"?"ie":r]||[],2);
 $("front").innerHTML=`<div class="brk"><b>Top story</b>${esc(lead.title)}</div>
-<article class="lead"><div><div class="kick">Top Story</div><h2>${esc(lead.title)}</h2>${img(lead)}<p>${esc(lead.desc)}</p><p class="cr"><a href="${safe(lead.url)}" target="_blank" rel="noopener">Read the full report at ${esc(lead.src)} &rarr;</a></p></div>
-<aside><div class="box"><b>Also today</b>${also.map(a=>`<div class="item"><a href="${safe(a.url)}" target="_blank" rel="noopener" style="color:inherit">${esc(a.title)}</a><div class="cr">${esc(a.src)}</div></div>`).join("")}</div>
+<article class="lead"><div><div class="kick">Top Story</div><h2>${esc(lead.title)}</h2>${img(lead)}<p>${esc(lead.desc)}</p><p class="cr"><a href="${safe(lead.url)}" target="_blank" rel="noopener">Read the full report at ${esc(lead.src)} &rarr;</a></p>${cov(lead)}</div>
+<aside><div class="box"><b>Also today</b>${also.map(a=>`<div class="item"><a href="${safe(a.url)}" target="_blank" rel="noopener" style="color:inherit">${esc(a.title)}</a><div class="cr">${esc(a.src)}${a.n>1?" &middot; "+a.n+" outlets":""}</div></div>`).join("")}</div>
 <div class="box"><b>Near you: ${REG[r]}</b>${near.map(a=>`<div class="item"><a href="${safe(a.url)}" target="_blank" rel="noopener" style="color:inherit">${esc(a.title)}</a><div class="cr">${esc(a.src)}</div></div>`).join("")||"<p>No local stories yet.</p>"}</div></aside></article>`}
 let t="";
 for(const k of st.i){const nm=IN.find(x=>x[0]===k)[1];
@@ -103,6 +109,11 @@ const src=k==="local"?(DATA.regions[r==="gl"?"ie":r]||[]):DATA[k];
 const l=uniq((src||[]).filter(a=>a.img).concat(src||[]),6);
 if(l.length)t+=`<div class="sec"><h4>${nm}</h4><div class="cards">${l.map(card).join("")}</div></div>`}
 $("secs").innerHTML=t;if($("cw"))cwInit()}
+function cov(s){if(!s.n)return"";const L=s.lean,t=s.n||1,w=k=>(L[k]/t*100).toFixed(0)+"%";
+return `<div class="box"><b>Covered by ${s.n} outlet${s.n>1?"s":""}</b>${s.blind?`<span class="blind">Mostly ${s.blind}-leaning coverage</span>`:""}<div class="bar" title="Left / Center / Right / Unrated"><i class="bl" style="width:${w("left")}"></i><i class="bc" style="width:${w("center")}"></i><i class="br" style="width:${w("right")}"></i><i class="bu" style="width:${w("unrated")}"></i></div><div class="cr">Left ${L.left} &middot; Center ${L.center} &middot; Right ${L.right} &middot; Unrated ${L.unrated}. Ratings are approximate. ${esc((s.outlets||[]).join(", "))}</div></div>`}
+function view(v){$("front").style.display=$("secs").style.display=v==="front"?"":"none";$("elec").style.display=v==="elec"?"":"none";$("t1").className=v==="front"?"on":"";$("t2").className=v==="elec"?"on":"";if(v==="elec")drawElec()}
+function drawElec(){$("elec").innerHTML=(DATA.elections||[]).map(e=>{const d=Math.ceil((new Date(e.date+"T00:00:00")-new Date())/864e5),dt=new Date(e.date+"T00:00:00").toLocaleDateString("en-ZA",{day:"numeric",month:"long",year:"numeric"});
+return `<div class="sec"><h4>${esc(e.flag)} &middot; ${esc(e.name)}</h4><p style="text-align:center;margin:0"><b style="font-size:28px;font-family:'Playfair Display',Georgia,serif">${d>0?d+" days to go":d===0?"Election day":"Voting held"}</b><br><span class="cr">${dt}</span></p><div class="box"><b>Background</b> (as of ${esc(DATA.factsAsOf)})<ul>${e.facts.map(f=>`<li>${esc(f)}</li>`).join("")}</ul></div><div class="cards">${uniq(e.news.filter(a=>a.img).concat(e.news),6).map(card).join("")}</div></div>`}).join("")}
 function openP(){pick=st.i.slice();$("chips").innerHTML="";
 IN.forEach(x=>{const d=document.createElement("span");d.className="chip";d.textContent=x[1];d.onclick=()=>{const k=pick.indexOf(x[0]);k>-1?pick.splice(k,1):pick.push(x[0]);paint()};d.dataset.k=x[0];$("chips").appendChild(d)});
 $("regsel").innerHTML=Object.entries(REG).map(([k,v])=>`<option value="${k}">${esc(v)}</option>`).join("");$("regsel").value=st.reg||guess();paint();$("ov").className="on"}
@@ -114,7 +125,7 @@ function chk(){let ok=0;ins.forEach((n,k)=>{const v=n.value.toUpperCase();if(!v)
 function rev(){ins.forEach((n,k)=>{n.value=WORDS[Math.floor(k/5)][k%5];n.className="ok"})}
 function clr(){ins.forEach(n=>{n.value="";n.className=""});$("msg").textContent=""}
 function tg(){const h=document.documentElement,d=matchMedia("(prefers-color-scheme: dark)").matches,c=h.dataset.theme||(d?"dark":"light");h.dataset.theme=c==="dark"?"light":"dark"}
-if(st.i.length&&st.reg)draw();else{st.reg=guess();st.i=IN.map(x=>x[0]);draw();openP()}
+view('front');if(st.i.length&&st.reg)draw();else{st.reg=guess();st.i=IN.map(x=>x[0]);draw();openP()}
 </script>
 </body>
 </html>
