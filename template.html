@@ -54,7 +54,13 @@ ul{margin:6px 0 0;padding-left:18px}
 .pr{position:relative;margin:6px 0;border:1px solid var(--ink);padding:7px 10px;font-size:14px;overflow:hidden}.pr i{position:absolute;left:0;top:0;bottom:0;background:var(--accent);opacity:.25}.pr span{position:relative;display:flex;justify-content:space-between;gap:8px}.pr.me{border-width:2px}
 .pn{display:grid;grid-template-columns:repeat(2,1fr);gap:0 20px}@media(max-width:760px){.pn{grid-template-columns:1fr}}
 @media(max-width:760px){.lead,.cards{grid-template-columns:1fr}.lead>aside,.cards>div{border-left:0;padding-left:0}}
+body{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M3 29 7 16 20 3 29 12 16 25Z' fill='%23161513' stroke='white' stroke-width='1.5'/%3E%3Cpath d='M3 29 11 21' stroke='white' stroke-width='1.5'/%3E%3C/svg%3E") 3 29,auto}a,button,select,label,.chip,.po,.tabs button{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cpath d='M3 29 7 16 20 3 29 12 16 25Z' fill='%239b1c1c' stroke='white' stroke-width='1.5'/%3E%3Cpath d='M3 29 11 21' stroke='white' stroke-width='1.5'/%3E%3C/svg%3E") 3 29,pointer}input[type=date]{cursor:text}
+*{-webkit-tap-highlight-color:transparent}
+#map{height:360px;border:2px solid var(--ink);margin:12px 0;z-index:0}.pin{background:var(--accent);color:#fff;border:2px solid #fff;border-radius:6px;text-align:center;font:600 12px 'Source Serif 4',Georgia,serif;line-height:1.15;padding:3px 0;box-shadow:0 2px 6px rgba(0,0,0,.45)}.pin b{display:block;letter-spacing:.1em}.pin i{font-style:normal;font-size:11px}
+select,input{font-size:16px}input[type=date]{background:var(--card);color:var(--ink);border:1px solid var(--ink);padding:4px}
+@media(max-width:760px){#map{height:280px}button,.chip,select,input{min-height:44px}button.g{min-height:36px}.tabs button{flex:1}.cw{grid-template-columns:repeat(5,minmax(0,1fr));width:100%;max-width:300px}.cw div{width:auto;aspect-ratio:1;height:auto}.wrap{padding:12px}.cdw div{min-width:0;flex:1}}
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
 </head>
 <body>
 <div id="ov"><div class="modal">
@@ -66,7 +72,7 @@ ul{margin:6px 0 0;padding-left:18px}
 <button onclick="save()">Print my edition</button>
 </div></div>
 <div class="wrap">
-<div class="top"><span id="date"></span><span id="regl"></span><span><button class="g" onclick="openP()">My interests</button><button class="g" onclick="tg()">Dark / Light</button></span></div>
+<div class="top"><span id="date"></span><span id="regl"></span><span><button class="g" onclick="share()">Share</button><button class="g" onclick="openP()">My interests</button><button class="g" onclick="tg()">Dark / Light</button></span></div>
 <h1>The Mlandu Times</h1>
 <p class="tag">Comfort the conflicted. <span>Conflict the comfortable.</span></p>
 <div class="dbl"></div>
@@ -78,7 +84,7 @@ ul{margin:6px 0 0;padding-left:18px}
 </div>
 <script>
 const DATA=/*__DATA__*/null;
-const IN=[["mideast","Palestine & Middle East"],["world","World"],["local","Local"],["sport","Sport"],["culture","Culture"],["tech","Tech"],["puzzles","Puzzles"]];
+const IN=[["mideast","Palestine & Middle East"],["world","World"],["local","Local"],["sport","Sport"],["culture","Culture"],["tech","Tech"],["stars","Horoscopes"],["puzzles","Puzzles"]];
 const REG={za:"South Africa",ie:"Ireland & UK",me:"Middle East",gl:"Elsewhere"};
 const WORDS=["HEART","EMBER","ABUSE","RESIN","TREND"];
 const $=id=>document.getElementById(id);
@@ -108,11 +114,12 @@ $("front").innerHTML=`<div class="brk"><b>Top story</b>${esc(lead.title)}</div>
 <div class="box"><b>Near you: ${REG[r]}</b>${near.map(a=>`<div class="item"><a href="${safe(a.url)}" target="_blank" rel="noopener" style="color:inherit">${esc(a.title)}</a><div class="cr">${esc(a.src)}</div></div>`).join("")||"<p>No local stories yet.</p>"}</div></aside></article>`}
 let t="";
 for(const k of st.i){const nm=IN.find(x=>x[0]===k)[1];
+if(k==="stars"){t+=starsHTML(nm);continue}
 if(k==="puzzles"){t+=`<div class="sec"><h4>${nm}</h4><div class="cwrap"><div><div class="cw" id="cw"></div><button onclick="chk()">Check</button><button onclick="rev()">Reveal</button><button onclick="clr()">Clear</button><p id="msg" style="font-size:14px"></p></div><div class="clues"><b>Across (rows)</b>1. Centre of the matter<br>2. Glowing coal<br>3. Rights groups document this<br>4. Sticky tree secretion<br>5. What is hot on social media<b>Down (columns)</b>1. Organ that skips a beat<br>2. Hot remnant after the flames<br>3. Misuse of power<br>4. Amber's origin<br>5. Direction of the polls</div></div></div>`;continue}
 const src=k==="local"?(DATA.regions[r==="gl"?"ie":r]||[]):DATA[k];
 const l=uniq((src||[]).filter(a=>a.img).concat(src||[]),6);
 if(l.length)t+=`<div class="sec"><h4>${nm}</h4><div class="cards">${l.map(card).join("")}</div></div>`}
-$("secs").innerHTML=t;if($("cw"))cwInit()}
+$("secs").innerHTML=t;if($("cw"))cwInit();if($("sg"))starsShow()}
 function cov(s){if(!s.n)return"";const L=s.lean,t=s.n||1,w=k=>(L[k]/t*100).toFixed(0)+"%";
 return `<div class="box"><b>Covered by ${s.n} outlet${s.n>1?"s":""}</b>${s.blind?`<span class="blind">Mostly ${s.blind}-leaning coverage</span>`:""}<div class="bar" title="Left / Center / Right / Unrated"><i class="bl" style="width:${w("left")}"></i><i class="bc" style="width:${w("center")}"></i><i class="br" style="width:${w("right")}"></i><i class="bu" style="width:${w("unrated")}"></i></div><div class="cr">Left ${L.left} &middot; Center ${L.center} &middot; Right ${L.right} &middot; Unrated ${L.unrated}. Ratings are approximate. ${esc((s.outlets||[]).join(", "))}</div></div>`}
 function view(v){$("front").style.display=$("secs").style.display=v==="front"?"":"none";$("elec").style.display=v==="elec"?"":"none";$("t1").className=v==="front"?"on":"";$("t2").className=v==="elec"?"on":"";if(v==="elec")drawElec()}
@@ -127,9 +134,39 @@ el.querySelector(".pb").innerHTML=m?o.map(k=>{const p=tot?Math.round((c[k]||0)/t
 async function vote(id,i){const el=document.querySelector('.poll[data-id="'+id+'"]'),k=JSON.parse(el.dataset.o)[i];if(mine(id))return;try{localStorage.setItem("mtv_"+id,k)}catch(e){}
 (PC[id]=PC[id]||{})[k]=(PC[id][k]||0)+1;drawPolls();try{await fetch(DATA.poll.url+"/rest/v1/rpc/cast_vote",{method:"POST",headers:ph(),body:JSON.stringify({p:id,c:k})});loadPolls()}catch(e){}}
 setInterval(()=>{if($("elec").style.display!=="none")loadPolls()},30000);
-function drawElec(){$("elec").innerHTML=(DATA.elections||[]).map(e=>{const dt=new Date(e.date+"T00:00:00").toLocaleDateString("en-ZA",{day:"numeric",month:"long",year:"numeric"});
+function drawElec(){$("elec").innerHTML='<div id="map"></div>'+(DATA.elections||[]).map(e=>{const dt=new Date(e.date+"T00:00:00").toLocaleDateString("en-ZA",{day:"numeric",month:"long",year:"numeric"});
 const polls=DATA.poll&&e.polls?`<div class="kick">Reader polls &middot; informal, not scientific</div><div class="pn">${e.polls.map(p=>`<div class="poll" data-id="${esc(p.id)}" data-o='${esc(JSON.stringify(p.o))}'><h3>${esc(p.q)}</h3><div class="pb"></div></div>`).join("")}</div>`:"";
-return `<div class="sec"><h4>${esc(e.flag)} &middot; ${esc(e.name)}</h4><p class="cr" style="text-align:center;margin:0">${dt}</p><div class="cdw" data-d="${esc(e.date)}"></div><div class="box"><b>Background</b> (as of ${esc(DATA.factsAsOf)})<ul>${e.facts.map(f=>`<li>${esc(f)}</li>`).join("")}</ul></div>${polls}<div class="cards">${uniq(e.news.filter(a=>a.img).concat(e.news),6).map(card).join("")}</div></div>`}).join("");tick();drawPolls();loadPolls()}
+return `<div class="sec" id="el-${esc(e.id)}"><h4>${esc(e.flag)} &middot; ${esc(e.name)}</h4><p class="cr" style="text-align:center;margin:0">${dt}</p><div class="cdw" data-d="${esc(e.date)}"></div><div class="box"><b>Background</b> (as of ${esc(DATA.factsAsOf)})<ul>${e.facts.map(f=>`<li>${esc(f)}</li>`).join("")}</ul></div>${polls}<div class="cards">${uniq(e.news.filter(a=>a.img).concat(e.news),6).map(card).join("")}</div></div>`}).join("");initMap();tick();drawPolls();loadPolls()}
+const SIGNS=[["Aries","♈","fire"],["Taurus","♉","earth"],["Gemini","♊","air"],["Cancer","♋","water"],["Leo","♌","fire"],["Virgo","♍","earth"],["Libra","♎","air"],["Scorpio","♏","water"],["Sagittarius","♐","fire"],["Capricorn","♑","earth"],["Aquarius","♒","air"],["Pisces","♓","water"]];
+const OPEN=["The planets are gossiping again, and you are the topic","Mercury is behaving, which is more than can be said for the news cycle","A quiet day hides a loud opportunity","Someone owes you a reply, and you owe someone an apology","Today rewards the person who reads the fine print","Your energy is high, so aim it somewhere useful","The universe is not sending signs, it is sending reminders","A small decision today will look clever by Friday"];
+const WORK=["A message you have been avoiding is easier to send than to dread","Someone senior notices the work you thought nobody saw","Say no to the meeting that could have been an email","A boring task hides the shortcut you need","Finish one thing properly instead of starting three","Ask for the number you actually want"];
+const LOVE=["Honesty beats mystery today","An old friend is thinking of you, so message first","Cook something for someone and skip the speech","Listen twice as long as you talk","A small gesture lands harder than a big promise","Do not text them at midnight, however tempting"];
+const ELEM={fire:"Lead, but listen before you do.",earth:"Slow and steady still wins, so do not rush the signature.",air:"Say it out loud instead of rehearsing it.",water:"Trust your gut, then check it against facts."};
+const COL=["crimson","teal","gold","navy","emerald","violet","charcoal","amber"];
+function signOf(m,d){const v=m*100+d;if(v>=1222||v<120)return 9;let r=9;for(const s of [[120,10],[219,11],[321,0],[420,1],[521,2],[621,3],[723,4],[823,5],[923,6],[1023,7],[1122,8]])if(v>=s[0])r=s[1];return r}
+function hs(s){let x=2166136261;for(let i=0;i<s.length;i++){x^=s.charCodeAt(i);x=Math.imul(x,16777619)}return x>>>0}
+function rnd(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function horo(i,day){const R=rnd(hs(day+SIGNS[i][0])),p=a=>a[Math.floor(R()*a.length)],s=SIGNS[i];
+return{txt:p(OPEN)+". "+p(WORK)+". "+p(LOVE)+". "+ELEM[s[2]]+(R()<.3?" Whatever you vote for this season, read the manifesto first.":""),love:1+Math.floor(R()*5),work:1+Math.floor(R()*5),luck:1+Math.floor(R()*5),num:1+Math.floor(R()*99),col:p(COL)}}
+const today=()=>new Date().toLocaleDateString("en-CA");
+function starsHTML(nm){return `<div class="sec" id="stars"><h4>${nm}</h4><p class="cr" style="text-align:center">For entertainment only. Our astrologer is a hash function seeded by the date and your sign, and it is very consistent.</p><div class="chips" id="sg"></div><label class="cr">Not sure of your sign? Birthday: <input type="date" id="bd" onchange="bday(this.value)"></label><div class="box" id="sx"></div></div>`}
+function bday(v){if(!v)return;const d=new Date(v+"T00:00:00");pickSign(signOf(d.getMonth()+1,d.getDate()))}
+function pickSign(i){try{localStorage.setItem("mts",i)}catch(e){}starsShow(i)}
+function starsShow(i){if(i===undefined){try{const v=localStorage.getItem("mts");i=v===null?null:+v}catch(e){i=null}}
+$("sg").innerHTML=SIGNS.map((s,k)=>`<span class="chip${k===i?" on":""}" onclick="pickSign(${k})">${s[1]} ${s[0]}</span>`).join("");
+if(i===null||i===undefined){$("sx").innerHTML="Pick your sign to read today's forecast.";return}
+const h=horo(i,today()),bar=n=>"&#9670;".repeat(n)+"&#9671;".repeat(5-n);
+$("sx").innerHTML=`<h3>${SIGNS[i][1]} ${SIGNS[i][0]}, ${new Date().toLocaleDateString("en-ZA",{weekday:"long",day:"numeric",month:"long"})}</h3><p>${esc(h.txt)}</p><div class="cr">Love ${bar(h.love)} &middot; Work ${bar(h.work)} &middot; Luck ${bar(h.luck)}<br>Lucky number ${h.num} &middot; Lucky colour ${h.col}</div>`}
+let MAP;
+function initMap(){if(!window.L||!$("map"))return;if(MAP){MAP.remove();MAP=null}
+const dk=(document.documentElement.dataset.theme||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"))==="dark";
+MAP=L.map("map",{scrollWheelZoom:false,worldCopyJump:true}).setView([12,-15],2);
+L.tileLayer("https://{s}.basemaps.cartocdn.com/"+(dk?"dark_all":"light_all")+"/{z}/{x}/{y}{r}.png",{attribution:"&copy; OpenStreetMap &copy; CARTO",maxZoom:7}).addTo(MAP);
+(DATA.elections||[]).forEach(e=>{if(e.lat===undefined)return;const v=cd(e.date);
+L.marker([e.lat,e.lng],{icon:L.divIcon({className:"",html:`<div class="pin"><b>${esc(e.flag)}</b><i>${v?v[0]+" days":"Today"}</i></div>`,iconSize:[60,38],iconAnchor:[30,19]})}).addTo(MAP)
+.bindPopup(`<b>${esc(e.name)}</b><br>${new Date(e.date+"T00:00:00").toLocaleDateString("en-ZA",{day:"numeric",month:"long",year:"numeric"})}<br><a href="#" onclick="document.getElementById('el-${esc(e.id)}').scrollIntoView({behavior:'smooth'});return false">Polls and news</a>`)});
+fetch("https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json").then(r=>r.json()).then(g=>{if(!MAP)return;const on=new Set((DATA.elections||[]).map(e=>e.iso));L.geoJSON(g,{filter:f=>on.has(f.id),style:{color:"#9b1c1c",weight:1.5,fillColor:"#9b1c1c",fillOpacity:.28}}).addTo(MAP)}).catch(()=>{})}
+function share(){const d={title:"The Mlandu Times",text:"Today's front page",url:location.href};if(navigator.share)navigator.share(d).catch(()=>{});else{try{navigator.clipboard.writeText(d.url)}catch(e){}alert("Link copied")}}
 function openP(){pick=st.i.slice();$("chips").innerHTML="";
 IN.forEach(x=>{const d=document.createElement("span");d.className="chip";d.textContent=x[1];d.onclick=()=>{const k=pick.indexOf(x[0]);k>-1?pick.splice(k,1):pick.push(x[0]);paint()};d.dataset.k=x[0];$("chips").appendChild(d)});
 $("regsel").innerHTML=Object.entries(REG).map(([k,v])=>`<option value="${k}">${esc(v)}</option>`).join("");$("regsel").value=st.reg||guess();paint();$("ov").className="on"}
