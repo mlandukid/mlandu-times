@@ -1,0 +1,5 @@
+{
+ "_note": "Public values from your Supabase project (Project Settings > API). Leave blank to hide polls.",
+ "supabaseUrl": "",
+ "supabaseAnonKey": ""
+}
