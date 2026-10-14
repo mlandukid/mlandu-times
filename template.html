@@ -59,8 +59,9 @@ body{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' wi
 #map{height:360px;border:2px solid var(--ink);margin:12px 0;z-index:0}.pin{background:var(--accent);color:#fff;border:2px solid #fff;border-radius:6px;text-align:center;font:600 12px 'Source Serif 4',Georgia,serif;line-height:1.15;padding:3px 0;box-shadow:0 2px 6px rgba(0,0,0,.45)}.pin b{display:block;letter-spacing:.1em}.pin i{font-style:normal;font-size:11px}
 select,input{font-size:16px}input[type=date]{background:var(--card);color:var(--ink);border:1px solid var(--ink);padding:4px}
 @media(max-width:760px){#map{height:280px}button,.chip,select,input{min-height:44px}button.g{min-height:36px}.tabs button{flex:1}.cw{grid-template-columns:repeat(5,minmax(0,1fr));width:100%;max-width:300px}.cw div{width:auto;aspect-ratio:1;height:auto}.wrap{padding:12px}.cdw div{min-width:0;flex:1}}
-</style>
+.dkmap .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.9)}</style>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-192.png"><meta name="theme-color" content="#9b1c1c">
 </head>
 <body>
 <div id="ov"><div class="modal">
@@ -76,11 +77,12 @@ select,input{font-size:16px}input[type=date]{background:var(--card);color:var(--
 <h1>The Mlandu Times</h1>
 <p class="tag">Comfort the conflicted. <span>Conflict the comfortable.</span></p>
 <div class="dbl"></div>
-<div class="tabs"><button id="t1" onclick="view('front')">Front Page</button><button id="t2" onclick="view('elec')">Elections</button></div>
+<div class="tabs"><button id="t1" onclick="view('front')">Front Page</button><button id="t2" onclick="view('elec')">Elections</button><button id="t3" onclick="view('arch')">Archive</button></div>
 <div id="front"></div>
 <div id="secs"></div>
 <div id="elec" style="display:none"></div>
-<div class="foot">We lean left, we say so, and we keep facts and opinion apart. Stories and images are supplied by the outlets credited, via GNews, and link back to the original. Updated daily.</div>
+<div id="arch" style="display:none"></div>
+<div class="foot">We lean left, we say so, and we keep facts and opinion apart. Stories and images are supplied by the outlets credited, via GNews, and link back to the original. Updated daily.<div id="fbx"></div><p><button class="g" id="fbb" onclick="fb()" style="display:none">Send feedback</button></p></div>
 </div>
 <script>
 const DATA=/*__DATA__*/null;
@@ -111,7 +113,7 @@ const also=(DATA.stories||[]).length?DATA.stories.slice(1,4).map(a=>(seen.add(a.
 $("front").innerHTML=`<div class="brk"><b>Top story</b>${esc(lead.title)}</div>
 <article class="lead"><div><div class="kick">Top Story</div><h2>${esc(lead.title)}</h2>${img(lead)}<p>${esc(lead.desc)}</p><p class="cr"><a href="${safe(lead.url)}" target="_blank" rel="noopener">Read the full report at ${esc(lead.src)} &rarr;</a></p>${cov(lead)}</div>
 <aside><div class="box"><b>Also today</b>${also.map(a=>`<div class="item"><a href="${safe(a.url)}" target="_blank" rel="noopener" style="color:inherit">${esc(a.title)}</a><div class="cr">${esc(a.src)}${a.n>1?" &middot; "+a.n+" outlets":""}</div></div>`).join("")}</div>
-<div class="box"><b>Near you: ${REG[r]}</b>${near.map(a=>`<div class="item"><a href="${safe(a.url)}" target="_blank" rel="noopener" style="color:inherit">${esc(a.title)}</a><div class="cr">${esc(a.src)}</div></div>`).join("")||"<p>No local stories yet.</p>"}</div></aside></article>`}
+<div class="box"><b>Near you: ${REG[r]}</b>${near.map(a=>`<div class="item"><a href="${safe(a.url)}" target="_blank" rel="noopener" style="color:inherit">${esc(a.title)}</a><div class="cr">${esc(a.src)}</div></div>`).join("")||"<p>No local stories yet.</p>"}</div><div class="box" id="wxb"></div></aside></article>`}
 let t="";
 for(const k of st.i){const nm=IN.find(x=>x[0]===k)[1];
 if(k==="stars"){t+=starsHTML(nm);continue}
@@ -119,10 +121,10 @@ if(k==="puzzles"){t+=`<div class="sec"><h4>${nm}</h4><div class="cwrap"><div><di
 const src=k==="local"?(DATA.regions[r==="gl"?"ie":r]||[]):DATA[k];
 const l=uniq((src||[]).filter(a=>a.img).concat(src||[]),6);
 if(l.length)t+=`<div class="sec"><h4>${nm}</h4><div class="cards">${l.map(card).join("")}</div></div>`}
-$("secs").innerHTML=t;if($("cw"))cwInit();if($("sg"))starsShow()}
+$("secs").innerHTML=t;if($("cw"))cwInit();if($("sg"))starsShow();weather();if(DATA.poll)$("fbb").style.display=""}
 function cov(s){if(!s.n)return"";const L=s.lean,t=s.n||1,w=k=>(L[k]/t*100).toFixed(0)+"%";
 return `<div class="box"><b>Covered by ${s.n} outlet${s.n>1?"s":""}</b>${s.blind?`<span class="blind">Mostly ${s.blind}-leaning coverage</span>`:""}<div class="bar" title="Left / Center / Right / Unrated"><i class="bl" style="width:${w("left")}"></i><i class="bc" style="width:${w("center")}"></i><i class="br" style="width:${w("right")}"></i><i class="bu" style="width:${w("unrated")}"></i></div><div class="cr">Left ${L.left} &middot; Center ${L.center} &middot; Right ${L.right} &middot; Unrated ${L.unrated}. Ratings are approximate. ${esc((s.outlets||[]).join(", "))}</div></div>`}
-function view(v){$("front").style.display=$("secs").style.display=v==="front"?"":"none";$("elec").style.display=v==="elec"?"":"none";$("t1").className=v==="front"?"on":"";$("t2").className=v==="elec"?"on":"";if(v==="elec")drawElec()}
+function view(v){$("front").style.display=$("secs").style.display=v==="front"?"":"none";$("elec").style.display=v==="elec"?"":"none";$("arch").style.display=v==="arch"?"":"none";["front","elec","arch"].forEach((k,i)=>{$("t"+(i+1)).className=v===k?"on":""});if(v==="elec")drawElec();if(v==="arch")drawArch()}
 function cd(date){const ms=new Date(date+"T00:00:00")-new Date();if(ms<=0)return null;const t=Math.floor(ms/1000);return[Math.floor(t/86400),Math.floor(t%86400/3600),Math.floor(t%3600/60),t%60]}
 function tick(){document.querySelectorAll(".cdw").forEach(w=>{const v=cd(w.dataset.d);w.innerHTML=v?["days","hours","mins","secs"].map((l,i)=>`<div><b>${String(v[i]).padStart(2,"0")}</b><span>${l}</span></div>`).join(""):"<b style=\"font:900 24px 'Playfair Display',serif\">Election day has arrived</b>"})}
 setInterval(tick,1000);
@@ -161,12 +163,22 @@ let MAP;
 function initMap(){if(!window.L||!$("map"))return;if(MAP){MAP.remove();MAP=null}
 const dk=(document.documentElement.dataset.theme||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"))==="dark";
 MAP=L.map("map",{scrollWheelZoom:false,worldCopyJump:true}).setView([12,-15],2);
-L.tileLayer("https://{s}.basemaps.cartocdn.com/"+(dk?"dark_all":"light_all")+"/{z}/{x}/{y}{r}.png",{attribution:"&copy; OpenStreetMap &copy; CARTO",maxZoom:7}).addTo(MAP);
+$("map").classList.toggle("dkmap",dk);L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"&copy; OpenStreetMap contributors",maxZoom:12}).addTo(MAP);
 (DATA.elections||[]).forEach(e=>{if(e.lat===undefined)return;const v=cd(e.date);
 L.marker([e.lat,e.lng],{icon:L.divIcon({className:"",html:`<div class="pin"><b>${esc(e.flag)}</b><i>${v?v[0]+" days":"Today"}</i></div>`,iconSize:[60,38],iconAnchor:[30,19]})}).addTo(MAP)
 .bindPopup(`<b>${esc(e.name)}</b><br>${new Date(e.date+"T00:00:00").toLocaleDateString("en-ZA",{day:"numeric",month:"long",year:"numeric"})}<br><a href="#" onclick="document.getElementById('el-${esc(e.id)}').scrollIntoView({behavior:'smooth'});return false">Polls and news</a>`)});
 fetch("https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json").then(r=>r.json()).then(g=>{if(!MAP)return;const on=new Set((DATA.elections||[]).map(e=>e.iso));L.geoJSON(g,{filter:f=>on.has(f.id),style:{color:"#9b1c1c",weight:1.5,fillColor:"#9b1c1c",fillOpacity:.28}}).addTo(MAP)}).catch(()=>{})}
 function share(){const d={title:"The Mlandu Times",text:"Today's front page",url:location.href};if(navigator.share)navigator.share(d).catch(()=>{});else{try{navigator.clipboard.writeText(d.url)}catch(e){}alert("Link copied")}}
+const WX=[[0,"Clear"],[3,"Partly cloudy"],[48,"Fog"],[57,"Drizzle"],[67,"Rain"],[77,"Snow"],[82,"Showers"],[99,"Thunderstorms"]];
+const CITY={za:["Johannesburg",-26.2,28.04],ie:["Dublin",53.35,-6.26],me:["Dubai",25.2,55.27],gl:["London",51.5,-0.12]};
+async function weather(lat,lng,name){const el=$("wxb");if(!el)return;const c=CITY[st.reg]||CITY.gl;if(lat===undefined){lat=c[1];lng=c[2];name=c[0]}
+try{const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=1`),j=await r.json(),w=(WX.find(x=>j.current.weather_code<=x[0])||[0,"Clear"])[1];
+el.innerHTML=`<b>Weather: ${esc(name)}</b><p style="margin:6px 0 0;font-size:24px;font-family:'Playfair Display',Georgia,serif">${Math.round(j.current.temperature_2m)}&deg;C</p><div class="cr">${w}. High ${Math.round(j.daily.temperature_2m_max[0])}&deg;, low ${Math.round(j.daily.temperature_2m_min[0])}&deg;. <a href="#" onclick="here();return false">Use my location</a></div>`}catch(e){el.style.display="none"}}
+function here(){navigator.geolocation&&navigator.geolocation.getCurrentPosition(p=>weather(p.coords.latitude,p.coords.longitude,"your area"),()=>{})}
+function drawArch(){const A=DATA.archive||[];$("arch").innerHTML='<div class="sec"><h4>Past editions</h4>'+(A.length?A.map(a=>`<div class="box"><b>${esc(new Date(a.d+"T00:00:00").toLocaleDateString("en-ZA",{weekday:"long",day:"numeric",month:"long",year:"numeric"}))}</b>${a.items.map(i=>`<div class="item"><a href="${safe(i.url)}" target="_blank" rel="noopener" style="color:inherit">${esc(i.title)}</a><div class="cr">${esc(i.src)}</div></div>`).join("")}</div>`).join(""):"<p>No past editions yet.</p>")+'<p class="cr" style="text-align:center">Headline archive, last 30 days. It starts the day this feature went live.</p></div>'}
+function fb(){$("fbx").innerHTML='<div class="box" style="text-align:left"><b>Tell us what is broken or what you want</b><textarea id="fbt" maxlength="1000" rows="4" style="width:100%;font:16px Georgia,serif;background:var(--paper);color:var(--ink);border:1px solid var(--ink);margin:6px 0"></textarea><button onclick="fbs()">Send</button> <span id="fbm" class="cr"></span></div>'}
+async function fbs(){const m=$("fbt").value.trim();if(!m)return;try{const r=await fetch(DATA.poll.url+"/rest/v1/feedback",{method:"POST",headers:{...ph(),Prefer:"return=minimal"},body:JSON.stringify({message:m,device:navigator.userAgent+" | "+innerWidth+"x"+innerHeight})});$("fbm").textContent=r.ok?"Thank you. Sent.":"Could not send, try again.";if(r.ok)$("fbt").value=""}catch(e){$("fbm").textContent="Could not send, try again."}}
+if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
 function openP(){pick=st.i.slice();$("chips").innerHTML="";
 IN.forEach(x=>{const d=document.createElement("span");d.className="chip";d.textContent=x[1];d.onclick=()=>{const k=pick.indexOf(x[0]);k>-1?pick.splice(k,1):pick.push(x[0]);paint()};d.dataset.k=x[0];$("chips").appendChild(d)});
 $("regsel").innerHTML=Object.entries(REG).map(([k,v])=>`<option value="${k}">${esc(v)}</option>`).join("");$("regsel").value=st.reg||guess();paint();$("ov").className="on"}

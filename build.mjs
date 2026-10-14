@@ -1,5 +1,5 @@
 // The Mlandu Times: daily edition builder. Run: GNEWS_API_KEY=xxx node build.mjs
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { readFile, writeFile, mkdir, cp } from "node:fs/promises";
 
 const KEY = process.env.GNEWS_API_KEY;
 if (!KEY) { console.error("Missing GNEWS_API_KEY"); process.exit(1); }
@@ -77,9 +77,17 @@ const stories = clusters.map(c => {
     score: srcs.length * 10 + srcs.filter(x => MAJOR.some(m => x.toLowerCase().includes(m))).length * 6 + (best.img ? 3 : 0) + (Date.now() - new Date(best.at) < 12 * 36e5 ? 8 : Date.now() - new Date(best.at) < 24 * 36e5 ? 4 : 0) };
 }).sort((a, b) => b.score - a.score).slice(0, 12);
 
-const data = { built: new Date().toISOString(), factsAsOf: FACTS_AS_OF, stories, world, mideast, sport, culture, tech, regions, elections, poll: CFG.supabaseUrl && CFG.supabaseAnonKey ? { url: CFG.supabaseUrl.replace(/\/$/, ""), key: CFG.supabaseAnonKey } : null };
+// Headline archive: carry previous days forward from the live site (last 30 days).
+let archive = [];
+const repo = process.env.GITHUB_REPOSITORY;
+if (repo) { try { const [o, n] = repo.split("/"); const r = await fetch(`https://${o}.github.io/${n}/archive.json`); if (r.ok) archive = await r.json(); } catch {} }
+const day = new Date().toISOString().slice(0, 10);
+if (stories.length) archive = [{ d: day, items: stories.slice(0, 6).map(x => ({ title: x.title, url: x.url, src: x.src })) }, ...archive.filter(a => a.d !== day)].slice(0, 30);
+const data = { built: new Date().toISOString(), factsAsOf: FACTS_AS_OF, stories, world, mideast, sport, culture, tech, regions, elections, archive, poll: CFG.supabaseUrl && CFG.supabaseAnonKey ? { url: CFG.supabaseUrl.replace(/\/$/, ""), key: CFG.supabaseAnonKey } : null };
 const tpl = await readFile(new URL("./template.html", import.meta.url), "utf8");
 await mkdir("dist", { recursive: true });
 await writeFile("dist/index.html", tpl.replace("/*__DATA__*/null", JSON.stringify(data).replace(/</g, "\\u003c")));
 await writeFile("dist/data.json", JSON.stringify(data, null, 2));
+await writeFile("dist/archive.json", JSON.stringify(archive));
+await cp("public", "dist", { recursive: true });
 console.log("Built", data.built, "| stories:", stories.length, "| top outlets:", stories[0]?.n);

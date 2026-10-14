@@ -13,4 +13,10 @@ $$;
 grant execute on function cast_vote(text, text) to anon;
 insert into poll_counts (poll_id, choice) values
 ${rows.join(",\n")}
-on conflict do nothing;`);
+on conflict do nothing;
+
+create table if not exists feedback (id bigint generated always as identity primary key, message text not null check (length(message) between 1 and 1000), device text, created_at timestamptz default now());
+alter table feedback enable row level security;
+drop policy if exists "anyone can send" on feedback;
+create policy "anyone can send" on feedback for insert to anon with check (true);
+grant insert on feedback to anon;`);
