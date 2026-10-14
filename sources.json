@@ -1,8 +1,20 @@
 {
-  "_note": "Approximate outlet leanings, based on commonly cited media-bias ratings. Edit freely. Anything not listed shows as Unrated.",
-  "the guardian": "left", "msnbc": "left", "huffpost": "left", "cnn": "left",
-  "new york times": "left", "washington post": "left",
-  "reuters": "center", "associated press": "center", "ap news": "center", "bbc": "center",
-  "fox news": "right", "breitbart": "right", "newsmax": "right",
-  "new york post": "right", "washington times": "right", "daily wire": "right"
+ "_note": "Approximate outlet leanings, based on commonly cited media-bias ratings. Edit freely. Anything not listed shows as Unrated.",
+ "the guardian": "left",
+ "msnbc": "left",
+ "huffpost": "left",
+ "cnn": "left",
+ "new york times": "left",
+ "washington post": "left",
+ "reuters": "center",
+ "associated press": "center",
+ "ap news": "center",
+ "bbc": "center",
+ "fox news": "right",
+ "breitbart": "right",
+ "newsmax": "right",
+ "new york post": "right",
+ "washington times": "right",
+ "daily wire": "right",
+ "ms now": "left"
 }

@@ -1,0 +1,98 @@
+{
+ "factsAsOf": "12 October 2026",
+ "elections": [
+  {
+   "id": "br",
+   "flag": "BR",
+   "name": "Brazil: presidential runoff",
+   "date": "2026-10-25",
+   "q": "Brazil runoff Lula Flavio Bolsonaro",
+   "facts": [
+    "Flavio Bolsonaro (right) took about 47% of valid votes in the 4 October first round against about 45% for President Lula (left), per the electoral court count reported by Xinhua and Reuters.",
+    "Rivals Ronaldo Caiado and Romeu Zema endorsed Bolsonaro after being knocked out (MercoPress).",
+    "Campaign themes: cost of living, corruption and public security."
+   ],
+   "polls": [
+    {
+     "id": "br-win",
+     "q": "Who will win the 25 October runoff? (prediction)",
+     "o": [
+      "Lula",
+      "Flávio Bolsonaro"
+     ]
+    },
+    {
+     "id": "br-vote",
+     "q": "Who would you vote for?",
+     "o": [
+      "Lula",
+      "Flávio Bolsonaro",
+      "Blank or null"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "us",
+   "flag": "US",
+   "name": "United States: midterm elections",
+   "date": "2026-11-03",
+   "q": "US midterm elections 2026 House Senate",
+   "facts": [
+    "All 435 House seats and roughly a third of the Senate are on the ballot.",
+    "The result decides who controls Congress for the second half of the presidential term."
+   ],
+   "polls": [
+    {
+     "id": "us-house",
+     "q": "Who wins the House? (prediction)",
+     "o": [
+      "Democrats",
+      "Republicans"
+     ]
+    },
+    {
+     "id": "us-senate",
+     "q": "Who controls the Senate? (prediction)",
+     "o": [
+      "Democrats",
+      "Republicans"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "za",
+   "flag": "ZA",
+   "name": "South Africa: local government elections",
+   "date": "2026-11-04",
+   "q": "South Africa local government elections IEC",
+   "facts": [
+    "Proclaimed for Wednesday 4 November 2026 and will set municipal councils for the next five-year term.",
+    "More than 29 million people are registered, and voters can only vote at the station where they registered (IEC).",
+    "Hundreds of parties are registered to contest, according to IEC figures reported in August."
+   ],
+   "polls": [
+    {
+     "id": "za-top",
+     "q": "Which party wins the most votes? (prediction)",
+     "o": [
+      "ANC",
+      "DA",
+      "MK Party",
+      "EFF",
+      "Another party"
+     ]
+    },
+    {
+     "id": "za-turn",
+     "q": "Will turnout beat 2021's 46%? (prediction)",
+     "o": [
+      "Yes",
+      "No"
+     ]
+    }
+   ]
+  }
+ ]
+}
