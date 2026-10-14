@@ -1,5 +1,5 @@
 {
  "_note": "Public values from your Supabase project (Project Settings > API). Leave blank to hide polls.",
- "supabaseUrl": "",
- "supabaseAnonKey": ""
+ "supabaseUrl": "https://czqunspohhtnhvloantu.supabase.co/rest/v1/",
+ "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6cXVuc3BvaGh0bmh2bG9hbnR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5ODIyNzAsImV4cCI6MjEwNzU1ODI3MH0.uGV4FnXok9qjnLjnYrOw5eifgwh-8G1QSZgbx36a2PM"
 }
